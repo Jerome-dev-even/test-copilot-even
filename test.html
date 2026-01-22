@@ -1,0 +1,191 @@
+
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Avertissement — IA non approuvée</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --brand:#0f62fe; --brand-dark:#0846b9;
+      --danger:#c53030; --text:#111827; --muted:#6b7280;
+      --bg:#ffffff; --bgpage:#f6f8fb;
+      --radius:12px; --shadow:0 10px 28px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.06);
+      --border:#e7ecf5; --focus:#ffbf47; --maxw:720px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --text:#e5e7eb; --muted:#9ca3af; --bg:#111827; --bgpage:#0b1220; --border:#223046; }
+    }
+    html, body { margin:0; padding:0; background:var(--bgpage); color:var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif; }
+    .container { max-width: var(--maxw); margin: 4vh auto; padding: 0 16px; }
+    .panel { background:var(--bg); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; border:1px solid var(--border); }
+    .header { padding: 16px 20px; background: #fff6f6; border-bottom:1px solid #f1dcdc; display:flex; gap:12px; align-items:center; }
+    @media (prefers-color-scheme: dark){
+      .header{ background:#2a1616; border-bottom-color:#4a2a2a; }
+    }
+    .badge { width:32px; height:32px; border-radius:50%; background:var(--danger); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
+    h1 { margin:0; font-size:1.15rem; color:#8a2424; }
+    @media (prefers-color-scheme: dark){ h1{ color:#ffb4b4; } }
+    .body { padding: 18px 20px; line-height:1.6; }
+    .body p { margin: .5rem 0; }
+    .small { font-size:.9rem; color:var(--muted); }
+    .note { background:#f5f7fb; border:1px dashed #d8deea; padding:12px; border-radius:8px; color:var(--muted); margin-top:10px; }
+    @media (prefers-color-scheme: dark){ .note{ background:#0f172a; border-color:#263247; } }
+    .footer { padding: 16px 20px 20px; border-top:1px solid var(--border); display:flex; flex-wrap:wrap; gap:10px; }
+    .btn {
+      appearance:none; border:0; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+      font-weight:600; border-radius:10px; padding:.7rem 1rem; text-decoration:none;
+      transition: background .2s ease, color .2s ease, transform .04s ease, box-shadow .2s ease; outline:none;
+    }
+    .btn:focus-visible{ box-shadow:0 0 0 3px var(--focus); }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{ background:var(--brand); color:#fff; }
+    .btn-primary:hover{ background:var(--brand-dark); }
+    .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover{ background: rgba(2,6,23,0.05); }
+    .btn-danger{ background:transparent; color:var(--danger); border:1px solid #f1d7d7; }
+    .btn-danger:hover{ background:#fff6f6; }
+    .hidden { display:none !important; }
+    .brand { font-weight:700; color:#0f62fe; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel" role="region" aria-labelledby="title">
+      <div class="header">
+        <div class="badge" aria-hidden="true">!</div>
+        <h1 id="title">Attention : utilisation d’une IA non approuvée</h1>
+      </div>
+
+      <div class="body">
+        <p><strong id="user"></strong>, vous avez tenté d’accéder à :</p>
+        <p><em id="url"></em></p>
+
+        <p>Zscaler indique que cette page appartient à la catégorie :
+          <strong id="cat"></strong>
+        </p>
+
+        <p id="reason-wrap" class="small hidden">
+          Motif : <span id="reason"></span>
+        </p>
+
+        <div class="note" role="note">
+          Pour vos usages professionnels, privilégiez <span class="brand">Microsoft Copilot</span> qui applique
+          nos standards de sécurité, de conformité et de gouvernance des données.
+          L’usage d’IA non approuvée peut exposer des informations sensibles et contrevenir aux politiques internes.
+        </div>
+
+        <p class="small" id="context">
+          Contexte :
+          action=<code id="action"></code>,
+          kind=<code id="kind"></code>,
+          rule=<code id="rule"></code>,
+          lang=<code id="lang"></code>
+        </p>
+      </div>
+
+      <div class="footer">
+        <!-- 1) Aller sur Copilot (à personnaliser si besoin) -->
+        <a id="btn-copilot" class="btn btn-primary" href="#" rel="noopener">Ouvrir Copilot sécurisé</a>
+
+        <!-- 2) Politique de gestion des données (à personnaliser) -->
+        <a id="btn-policy" class="btn btn-ghost" href="#" rel="noopener">Lire la politique de données</a>
+
+        <!-- 3) Continuer quand même (redirige vers l'URL initiale si présente) -->
+        <a id="btn-continue" class="btn btn-danger hidden" href="#" rel="noopener">
+          Continuer quand même (je comprends les risques)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      /**
+       * 1) Paramètres Zscaler ?url=...&user=...&reason=...&cat=...&lang=...&action=...&kind=...&rule=...
+       * 2) Valeurs de test si manquants (pour GitHub Pages / local)
+       */
+      const qs = new URLSearchParams(window.location.search);
+
+      const defaults = {
+        url:     "https://ia-non-approuvee.com/chat",
+        user:    "utilisateur.test@even.fr",
+        reason:  "",
+        cat:     "Artificial Intelligence",
+        lang:    "fr_FR",
+        action:  "block",
+        kind:    "category",
+        rule:    "322760",
+        copilot: "https://www.bing.com/chat",               // 👉 à personnaliser si besoin
+        policy:  "https://tonsharepoint/politique-de-donnees"// 👉 à personnaliser
+      };
+
+      const getOr = (key) => {
+        const v = qs.get(key);
+        return (v && v.trim() !== "") ? v.trim() : defaults[key];
+      };
+
+      const data = {
+        url:    getOr("url"),
+        user:   getOr("user"),
+        reason: getOr("reason"),
+        cat:    getOr("cat"),
+        lang:   getOr("lang"),
+        action: getOr("action"),
+        kind:   getOr("kind"),
+        rule:   getOr("rule"),
+        copilot:getOr("copilot"),
+        policy: getOr("policy")
+      };
+
+      // -------------- Injection DOM (aucune valeur en dur dans le HTML) --------------
+      const setText = (id, value, hideIfEmpty=false) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!value && hideIfEmpty) { el.classList.add("hidden"); return; }
+        el.textContent = value || "";
+        el.classList.remove("hidden");
+      };
+
+      setText("user", data.user || "Utilisateur");
+      setText("url",  data.url);
+      setText("cat",  data.cat);
+      setText("action", data.action);
+      setText("kind", data.kind);
+      setText("rule", data.rule);
+      setText("lang", data.lang);
+
+      // reason facultatif
+      if (data.reason) {
+        setText("reason", data.reason);
+        document.getElementById("reason-wrap").classList.remove("hidden");
+      }
+
+      // -------------- Boutons --------------
+      const btnCopilot  = document.getElementById("btn-copilot");
+      const btnPolicy   = document.getElementById("btn-policy");
+      const btnContinue = document.getElementById("btn-continue");
+
+      // Liens Copilot & Politique (toujours disponibles)
+      if (btnCopilot) btnCopilot.href = data.copilot;
+      if (btnPolicy)  btnPolicy.href  = data.policy;
+
+      // Bouton Continuer : activé seulement si l’URL est valide
+      if (btnContinue) {
+        try {
+          const u = new URL(data.url);
+          btnContinue.href = u.toString();
+          btnContinue.classList.remove("hidden");
+        } catch (e) {
+          // URL invalide → on laisse le bouton caché
+          btnContinue.classList.add("hidden");
+        }
+      }
+
+      // Si tu veux tracer l’appui sur "Continuer", ajoute ici un fetch() vers ton endpoint interne.
+    })();
+  </script>
+</body>
+</html>
