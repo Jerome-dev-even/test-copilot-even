@@ -172,20 +172,41 @@
       if (btnCopilot) btnCopilot.href = data.copilot;
       if (btnPolicy)  btnPolicy.href  = data.policy;
 
-      // Bouton Continuer : activé seulement si l’URL est valide
-      if (btnContinue) {
-        try {
-          const u = new URL(data.url);
-          btnContinue.href = u.toString();
-          btnContinue.classList.remove("hidden");
-        } catch (e) {
-          // URL invalide → on laisse le bouton caché
-          btnContinue.classList.add("hidden");
-        }
-      }
+		// ----------- Bouton Continuer (version Zscaler simplifiée) -----------
+
+		if (btnContinue) {
+		  const qs = new URLSearchParams(window.location.search);
+
+		  const rawUrl = qs.get("url") || "";
+		  const rawZsq = qs.get("zsq") || "";
+		  const rawCat = qs.get("cat") || "";
+
+		  // Nettoyage RID (si finit par "zsq" → on retire)
+		  const rid = rawZsq.endsWith("zsq") ? rawZsq.slice(0, -3) : rawZsq;
+
+		  // Encodage requis
+		  const smUrl = encodeURIComponent(rawUrl);
+		  const smCat = encodeURIComponent(rawCat);
+
+		  // 👉 Cloud fixe Zscaler : À REMPLACER PAR LE VÔTRE
+		  const ZSCALER_CLOUD = "zscalerthree.net";
+
+		  // Si un paramètre essentiel manque → on masque le bouton
+		  if (!rawUrl || !rid || !rawCat) {
+			btnContinue.classList.add("hidden");
+		  } else {
+			// Construction du lien officiel "Continue"
+			const continueUrl =
+			  `https://gateway.${ZSCALER_CLOUD}:443/_sm_ctn?_sm_url=${smUrl}&_sm_rid=${encodeURIComponent(rid)}&_sm_cat=${smCat}`;
+
+			btnContinue.href = continueUrl;
+			btnContinue.classList.remove("hidden");
+		  }
+		}
 
       // Si tu veux tracer l’appui sur "Continuer", ajoute ici un fetch() vers ton endpoint interne.
     })();
   </script>
 </body>
+
 </html>
