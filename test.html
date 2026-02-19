@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="fr">
 <head>
@@ -8,7 +7,7 @@
   <meta name="color-scheme" content="light dark" />
   <style>
     :root{
-      --brand:#0f62fe; --brand-dark:#0846b9;
+      --brand:#587dac; --brand-dark:#abbf06;
       --danger:#c53030; --text:#111827; --muted:#6b7280;
       --bg:#ffffff; --bgpage:#f6f8fb;
       --radius:12px; --shadow:0 10px 28px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.06);
@@ -17,7 +16,12 @@
     @media (prefers-color-scheme: dark){
       :root{ --text:#e5e7eb; --muted:#9ca3af; --bg:#111827; --bgpage:#0b1220; --border:#223046; }
     }
-    html, body { margin:0; padding:0; background:var(--bgpage); color:var(--text);
+    html, body { margin:0;
+	padding:0;
+	background:var(--bgpage);
+	background-color:var(--brand);
+	background-position: center;
+	color:var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif; }
     .container { max-width: var(--maxw); margin: 4vh auto; padding: 0 16px; }
     .panel { background:var(--bg); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; border:1px solid var(--border); }
@@ -36,7 +40,7 @@
     .footer { padding: 16px 20px 20px; border-top:1px solid var(--border); display:flex; flex-wrap:wrap; gap:10px; }
     .btn {
       appearance:none; border:0; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
-      font-weight:600; border-radius:10px; padding:.7rem 1rem; text-decoration:none;
+      font-weight:600; border-radius:10px; padding:.7rem 1rem .7rem 0rem; text-decoration:none;
       transition: background .2s ease, color .2s ease, transform .04s ease, box-shadow .2s ease; outline:none;
     }
     .btn:focus-visible{ box-shadow:0 0 0 3px var(--focus); }
@@ -48,50 +52,38 @@
     .btn-danger{ background:transparent; color:var(--danger); border:1px solid #f1d7d7; }
     .btn-danger:hover{ background:#fff6f6; }
     .hidden { display:none !important; }
-    .brand { font-weight:700; color:#0f62fe; }
+    .brand { font-weight:700; color:#587dac; }
   </style>
+  <link rel="icon" type="image/png" href="https://www.even.fr/sites/default/themes/geven/logo.png">
 </head>
 <body>
   <div class="container">
     <div class="panel" role="region" aria-labelledby="title">
       <div class="header">
         <div class="badge" aria-hidden="true">!</div>
-        <h1 id="title">Attention : utilisation d’une IA non approuvée</h1>
+        <h1 id="title">Attention : utilisation d’une IA publique non validée par le groupe</h1>
       </div>
 
       <div class="body">
-        <p><strong id="user"></strong>, vous avez tenté d’accéder à :</p>
-        <p><em id="url"></em></p>
-
-        <p>Zscaler indique que cette page appartient à la catégorie :
-          <strong id="cat"></strong>
-        </p>
-
+        <p>Bonjour <strong id="user"></strong>,
+		</br>
+		vous avez tenté d’accéder à : <em id="url"></em></p>
+		</br>
         <p id="reason-wrap" class="small hidden">
           Motif : <span id="reason"></span>
         </p>
-
         <div class="note" role="note">
-          Pour vos usages professionnels, privilégiez <span class="brand">Microsoft Copilot</span> qui applique
-          nos standards de sécurité, de conformité et de gouvernance des données.
-          L’usage d’IA non approuvée peut exposer des informations sensibles et contrevenir aux politiques internes.
+          <p>Le Groupe Even a selectionné <span class="brand">Copilot<img src ='https://logos-world.net/wp-content/uploads/2023/10/Microsoft-Copilot-Logo.png' style="width:20px;"></span> pour garantir la confidentialité et la sécurité de nos données d'entreprise.
+		  L'usage des IA est encadré par le <a target="_blank" href='www.even.fr'>guide d'utilisation<a>.</p>
+		  <p>Retrouvez le <a target="_blank" href='www.even.fr'>mémo utilisateur</a> de Copilot chat dans votre environnement Microsoft.</p>
         </div>
-
-        <p class="small" id="context">
-          Contexte :
-          action=<code id="action"></code>,
-          kind=<code id="kind"></code>,
-          rule=<code id="rule"></code>,
-          lang=<code id="lang"></code>
-        </p>
       </div>
-
       <div class="footer">
         <!-- 1) Aller sur Copilot (à personnaliser si besoin) -->
-        <a id="btn-copilot" class="btn btn-primary" href="#" rel="noopener">Ouvrir Copilot sécurisé</a>
-
+        <a id="btn-copilot" class="btn btn-primary" href="#" rel="noopener"><img src ='https://logos-world.net/wp-content/uploads/2023/10/Microsoft-Copilot-Logo.png' style="width:40px;">Ouvrir Copilot sécurisé</a>
+		
         <!-- 2) Politique de gestion des données (à personnaliser) -->
-        <a id="btn-policy" class="btn btn-ghost" href="#" rel="noopener">Lire la politique de données</a>
+        <a id="btn-policy" class="btn btn-ghost" target="_blank" href="#" rel="noopener" style="padding-left: 1rem;">Lire la politique de données</a>
 
         <!-- 3) Continuer quand même (redirige vers l'URL initiale si présente) -->
         <a id="btn-continue" class="btn btn-danger hidden" href="#" rel="noopener">
@@ -99,6 +91,19 @@
         </a>
       </div>
     </div>
+		<div style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;          /* Très important */
+    display: flex;
+    justify-content: center;
+    pointer-events: none; /* optionnel si ça gêne */
+"><img style="
+    pointer-events: auto; /* si tu dois pouvoir cliquer */
+    display: block;
+    margin: 0;            /* évite les décalages */
+" src="https://www.even.fr/sites/default/themes/geven/logo.png" alt="Accueil" height="90" width="90"></div>
   </div>
 
   <script>
@@ -210,6 +215,5 @@
 </body>
 
 </html>
-
 
 
