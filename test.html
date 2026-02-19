@@ -45,8 +45,8 @@
     }
     .btn:focus-visible{ box-shadow:0 0 0 3px var(--focus); }
     .btn:active{ transform: translateY(1px); }
-    .btn-primary{ background:var(--brand); color:#fff; }
-    .btn-primary:hover{ background:var(--brand-dark); }
+    .btn-primary{ background:var(--brand); color:#fff; flex: 1;}
+    .btn-primary:hover{ background:var(--brand-dark);}
     .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); }
     .btn-ghost:hover{ background: rgba(2,6,23,0.05); }
     .btn-danger{ background:transparent; color:var(--danger); border:1px solid #f1d7d7; }
@@ -79,16 +79,13 @@
         </div>
       </div>
       <div class="footer">
-        <!-- 1) Aller sur Copilot (à personnaliser si besoin) -->
-        <a id="btn-copilot" class="btn btn-primary" href="#" rel="noopener"><img src ='https://logos-world.net/wp-content/uploads/2023/10/Microsoft-Copilot-Logo.png' style="width:40px;">Ouvrir Copilot sécurisé</a>
-		
-        <!-- 2) Politique de gestion des données (à personnaliser) -->
-        <a id="btn-policy" class="btn btn-ghost" target="_blank" href="#" rel="noopener" style="padding-left: 1rem;">Lire la politique de données</a>
-
-        <!-- 3) Continuer quand même (redirige vers l'URL initiale si présente) -->
+        <!-- 1) Continuer quand même (redirige vers l'URL initiale si présente) -->
         <a id="btn-continue" class="btn btn-danger hidden" href="#" rel="noopener" style="padding-left: 1rem;">
           Continuer quand même (je comprends les risques)
         </a>
+        <!-- 2) Aller sur Copilot (à personnaliser si besoin) -->
+        <a id="btn-copilot" class="btn btn-primary" href="#" rel="noopener"><img src ='https://logos-world.net/wp-content/uploads/2023/10/Microsoft-Copilot-Logo.png' style="width:40px;">Ouvrir Copilot sécurisé</a>
+
       </div>
     </div>
 		<div style="
